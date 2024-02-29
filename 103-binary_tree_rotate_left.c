@@ -1,49 +1,36 @@
 #include "binary_trees.h"
-#include <stdlib.h>
 
 /**
- * binary_tree_is_complete - Checks if a binary tree is complete
- * @tree: A pointer to the root node of the tree to check
+ * binary_tree_rotate_left - Performs a left-rotation on a binary tree.
  *
- * Return: 1 if the tree is complete, 0 otherwise
+ * @tree: A pointer to the root node of the tree to rotate.
+ *
+ * Return: A pointer to the new root node of the tree once rotated.
  */
-int binary_tree_is_complete(const binary_tree_t *tree)
+binary_tree_t *binary_tree_rotate_left(binary_tree_t *tree)
 {
-	int front = 0, rear = 0;
-	int non_full_node_seen = 0;
 
-	binary_tree_t **queue = malloc(sizeof(binary_tree_t *) * 1024);
+	binary_tree_t *pivot, *tmp;
 
-	if (tree == NULL)
-		return (0);
+	if (tree == NULL || tree->right == NULL)
+		return (NULL);
 
-	if (queue == NULL)
-		return (0);
-
-	queue[rear++] = (binary_tree_t *)tree;
-
-	while (front < rear)
+	pivot = tree->right;
+	tmp = pivot->left;
+	pivot->left = tree;
+	tree->right = tmp;
+	if (tmp != NULL)
+		tmp->parent = tree;
+	tmp = tree->parent;
+	tree->parent = pivot;
+	pivot->parent = tmp;
+	if (tmp != NULL)
 	{
-		binary_tree_t *current = queue[front++];
-
-		if (current == NULL)
-		{
-			non_full_node_seen = 1;
-		}
+		if (tmp->left == tree)
+			tmp->left = pivot;
 		else
-		{
-			if (non_full_node_seen)
-			{
-				free(queue);
-				return (0);
-			}
-
-			queue[rear++] = current->left;
-
-			queue[rear++] = current->right;
-		}
+			tmp->right = pivot;
 	}
-	free(queue);
 
-	return (1);
+	return (pivot);
 }
